@@ -1,20 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  SafeAreaView,
-  Button,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, FlatList, Pressable, useColorScheme } from "react-native";
 import { Todo } from "@/constants/type/Todo";
-import { router } from "expo-router";
 import dayjs from "dayjs";
 import { generalStyles } from "@/constants/style/General";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { Colors } from "@/constants/Colors";
 
 export default function Index() {
   //TODO: add todos from local storage
@@ -35,7 +27,7 @@ export default function Index() {
       title: "Cuci mobil",
       description: "Cuci mobil di tempat cuci mobil",
       category: "rumah tangga",
-      time: "2024-10-22T14:30:00Z",
+      time: "2024-10-25T14:30:00Z",
       duration: 45,
       important: false,
     },
@@ -45,7 +37,7 @@ export default function Index() {
       title: "Beli buku",
       description: "Beli buku di toko buku",
       category: "pendidikan",
-      time: "2024-10-23T16:00:00Z",
+      time: "2024-10-25T16:00:00Z",
       duration: 30,
       important: true,
     },
@@ -55,7 +47,7 @@ export default function Index() {
       title: "Kunjungi dokter gigi",
       description: "Pemeriksaan gigi rutin",
       category: "kesehatan",
-      time: "2024-10-24T09:00:00Z",
+      time: "2024-10-25T09:00:00Z",
       duration: 60,
       important: true,
     },
@@ -65,7 +57,7 @@ export default function Index() {
       title: "Bayar tagihan listrik",
       description: "Bayar tagihan listrik bulan ini",
       category: "keuangan",
-      time: "2024-10-24T11:00:00Z",
+      time: "2024-10-25T11:00:00Z",
       duration: 15,
       important: true,
     },
@@ -75,7 +67,7 @@ export default function Index() {
       title: "Olahraga",
       description: "Lari pagi di taman",
       category: "kesehatan",
-      time: "2024-10-24T06:00:00Z",
+      time: "2024-10-25T06:00:00Z",
       duration: 45,
       important: false,
     },
@@ -85,7 +77,7 @@ export default function Index() {
       title: "Rapat tim",
       description: "Rapat mingguan dengan tim",
       category: "pekerjaan",
-      time: "2024-10-27T13:00:00Z",
+      time: "2024-10-25T13:00:00Z",
       duration: 90,
       important: true,
     },
@@ -95,7 +87,7 @@ export default function Index() {
       title: "Belanja bulanan",
       description: "Belanja kebutuhan bulanan di supermarket",
       category: "rumah tangga",
-      time: "2024-10-28T10:00:00Z",
+      time: "2024-10-25T10:00:00Z",
       duration: 120,
       important: true,
     },
@@ -247,7 +239,9 @@ export default function Index() {
   };
 
   let [todos, setTodos] = useState(
-    getTodayTodos(sortTodosByDate(initialTodos))
+    // getTodayTodos(
+    sortTodosByDate(initialTodos)
+    // )
   );
 
   const toggleCompletedTodo = (toggleTodoId: number) => {
@@ -296,47 +290,51 @@ export default function Index() {
     });
   };
 
+  const colorScheme = useColorScheme();
+  const ThemedStyle = StyleSheet.create({
+    content: {
+      flex: 1,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: 4,
+      marginBottom: 4,
+      borderWidth: 2,
+      padding: 8,
+      borderRadius: 8,
+      borderColor: Colors[colorScheme ?? "light"].text,
+    },
+  });
+
   return (
-    <SafeAreaView style={generalStyles.container}>
-      <View style={generalStyles.header}>
-        <Text style={generalStyles.title}>Todo app </Text>
-        <Button
-          title="Add"
-          onPress={() => {
-            router.push({
-              pathname: "/addTodo",
-              params: {
-                id: lastId + 1,
-                todos: JSON.stringify(todos),
-              },
-            });
-          }}
-        />
-      </View>
+    <ThemedView style={generalStyles.container}>
       <FlatList
+        showsVerticalScrollIndicator={false}
         data={todos}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.content}>
-            <View style={styles.todoItemContent}>
-              <Text style={styles.todoItemTimeText}>
+          <ThemedView style={ThemedStyle.content}>
+            <ThemedView style={styles.todoItemContent}>
+              <ThemedText style={styles.todoItemTimeText}>
                 {`${convertTime(item.time)} - ${convertTime(
                   item.time,
                   item.duration
                 )}`}
-              </Text>
-              <Text
+              </ThemedText>
+              <ThemedText
                 style={
                   item.completed ? styles.todoTitleCompleted : styles.todoTitle
                 }
               >
                 {item.title}
-              </Text>
-              <Text style={styles.todoDescription}>{item.description}</Text>
-            </View>
+              </ThemedText>
+              <ThemedText style={styles.todoDescription}>
+                {item.description}
+              </ThemedText>
+            </ThemedView>
 
-            <View style={styles.todoIconContainer}>
-              <TouchableOpacity onPress={() => toggleImportantTodo(item.id)}>
+            <ThemedView style={styles.todoIconContainer}>
+              <Pressable onPress={() => toggleImportantTodo(item.id)}>
                 {item.important ? (
                   <Ionicons
                     style={styles.todoImportantIcon}
@@ -350,9 +348,9 @@ export default function Index() {
                     color="grey"
                   />
                 )}
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity onPress={() => toggleCompletedTodo(item.id)}>
+              <Pressable onPress={() => toggleCompletedTodo(item.id)}>
                 {item.completed ? (
                   <Ionicons
                     style={styles.todoCompleteIcon}
@@ -366,22 +364,15 @@ export default function Index() {
                     color="grey"
                   />
                 )}
-              </TouchableOpacity>
-            </View>
-          </View>
+              </Pressable>
+            </ThemedView>
+          </ThemedView>
         )}
       />
-    </SafeAreaView>
+    </ThemedView>
   );
 }
-
 const styles = StyleSheet.create({
-  content: {
-    ...generalStyles.content,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   todoItemContainer: {
     padding: 8,
     marginBottom: 8,
@@ -390,8 +381,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderTopColor: "#ccc",
-    borderBottomColor: "#ccc",
   },
   todoItemTimeText: {
     fontSize: 10,
@@ -421,8 +410,10 @@ const styles = StyleSheet.create({
   todoCompleteIcon: {
     fontSize: 24,
   },
+  button: {
+    marginHorizontal: 8,
+  },
 });
-
 //TODO - group by date
 //TODO - add new todo
 //TODO - edit todo
