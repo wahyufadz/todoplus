@@ -18,6 +18,7 @@ import DateTimePicker, {
   DateTimePickerAndroid,
 } from "@react-native-community/datetimepicker";
 import DurationPicker from "@/components/DurationPicker";
+import { addTodo } from "@/services/todoService";
 
 export default function AddTodo() {
   let [title, setTitle] = useState("");
@@ -44,21 +45,25 @@ export default function AddTodo() {
     }
   };
 
-  const handleAddTodo = () => {
+  const handleAddTodo = async () => {
     if (hasError) {
       // Tampilkan error jika ada
       console.log("Error:", error);
     } else {
+      const newTodo = await addTodo({
+        id: null,
+        completed: false,
+        important: false,
+        title,
+        description,
+        duration,
+        time: time.toISOString(),
+        category,
+      });
+
       // Jika semua validasi berhasil, lanjutkan dengan pengiriman data
       router.replace({
         pathname: "/",
-        params: {
-          title,
-          description,
-          duration,
-          time: time.toISOString(),
-          category,
-        },
       });
     }
   };
